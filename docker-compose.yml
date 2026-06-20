@@ -1,0 +1,30 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    restart: unless-stopped
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+    environment:
+      # Permite que el ICE negotiation de WebRTC resuelva correctamente
+      # cuando los viewers se conectan desde otra máquina en la red.
+      - MTX_WEBRTCADDITIONALHOSTS=${SERVER_HOST}
+    ports:
+      - "8554:8554"   # RTSP (opcional, útil para depurar con ffplay/vlc)
+      - "8889:8889"   # WebRTC / WHEP (lo usa el frontend para el preview)
+      - "8189:8189/udp" # WebRTC ICE
+      # 9997 (Control API) NO se expone: solo el backend le habla por la red interna.
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mediamtx
+    environment:
+      - MEDIAMTX_API_URL=http://mediamtx:9997
+      - MEDIAMTX_WEBRTC_PUBLIC_URL=http://${SERVER_HOST}:8889
+      - FRONTEND_DIR=/app/frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./frontend/dist:/app/frontend:ro

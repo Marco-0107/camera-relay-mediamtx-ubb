@@ -1,0 +1,12 @@
+.env
+backend/data/
+node_modules/
+frontend/dist/
+
+# Notas personales de desarrollo, no se publican en el repo.
+COMO_FUNCIONA.md
+
+# Modo PM2: binario de MediaMTX (específico de plataforma, no se versiona)
+# y copia de trabajo del yml que MediaMTX reescribe en caliente.
+mediamtx/bin/
+mediamtx/runtime/
