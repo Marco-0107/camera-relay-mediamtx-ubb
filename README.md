@@ -73,6 +73,7 @@ En este entorno no hay acceso para correr Docker anidado, así que los 3 proceso
   cp backend/.env.example backend/.env
   # editar MEDIAMTX_API_URL=http://127.0.0.1:9997 (mediamtx corre local, no en docker)
   # editar MEDIAMTX_WEBRTC_PUBLIC_URL=http://<host-uni>:8889
+  # editar MEDIAMTX_RTSP_PUBLIC_URL=rtsp://<host-uni>:8554  (enlace para VLC/ffplay)
   # editar CORS_ORIGIN=http://<host-uni>:4173 (origen del frontend)
 
   cp frontend/.env.example frontend/.env
@@ -99,10 +100,11 @@ Vuelve a correr `./scripts/deploy-pm2.sh` cada vez que actualices código (hace 
 
 ## Cómo consumen el stream los demás usuarios
 
-Cada usuario puede ver la retransmisión de dos formas, sin tocar la cámara original:
+Cada usuario puede ver la retransmisión de varias formas, sin tocar la cámara original:
 
-- Desde el frontend, seleccionando la cámara.
-- Directamente con cualquier cliente WHEP/WebRTC apuntando a `http://<host>:8889/<pathName>/whep`, o con un cliente RTSP a `rtsp://<host>:8554/<pathName>` (puerto expuesto solo para depuración).
+- Desde el frontend, seleccionando la cámara (vista previa en el navegador vía WHEP/WebRTC).
+- Copiando el enlace RTSP que ofrece el frontend (`rtsp://<host>:8554/<pathName>`) y abriéndolo en **VLC**, **ffplay** u **OBS**.
+- Directamente con cualquier cliente WHEP/WebRTC apuntando a `http://<host>:8889/<pathName>/whep`.
 
 ## Si la cámara tiene IP link-local (169.254.x.x)
 

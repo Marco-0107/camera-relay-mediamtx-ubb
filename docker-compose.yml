@@ -22,6 +22,7 @@ services:
     environment:
       - MEDIAMTX_API_URL=http://mediamtx:9997
       - MEDIAMTX_WEBRTC_PUBLIC_URL=http://${SERVER_HOST}:8889
+      - MEDIAMTX_RTSP_PUBLIC_URL=rtsp://${SERVER_HOST}:8554
       - FRONTEND_DIR=/app/frontend
     ports:
       - "3000:3000"
