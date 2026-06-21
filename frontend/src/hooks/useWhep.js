@@ -18,6 +18,8 @@ export function useWhep(videoRef) {
   const pcRef = useRef(null);
   const resourceUrlRef = useRef(null);
   const [error, setError] = useState('');
+  // 'idle' | 'connecting' | 'live' | 'error'
+  const [status, setStatus] = useState('idle');
 
   const stop = useCallback(() => {
     if (resourceUrlRef.current) {
@@ -31,10 +33,12 @@ export function useWhep(videoRef) {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    setStatus('idle');
   }, [videoRef]);
 
   const start = useCallback(async (whepBaseUrl, pathName) => {
     setError('');
+    setStatus('connecting');
     try {
       const pc = new RTCPeerConnection();
       pcRef.current = pc;
@@ -42,6 +46,16 @@ export function useWhep(videoRef) {
       pc.addTransceiver('audio', { direction: 'recvonly' });
       pc.ontrack = (event) => {
         if (videoRef.current) videoRef.current.srcObject = event.streams[0];
+        setStatus('live');
+      };
+      pc.onconnectionstatechange = () => {
+        if (!pcRef.current) return;
+        const state = pcRef.current.connectionState;
+        if (state === 'connected') setStatus('live');
+        else if (state === 'failed' || state === 'disconnected') {
+          setStatus('error');
+          setError('Se perdió la conexión con la retransmisión.');
+        }
       };
 
       const offer = await pc.createOffer();
@@ -66,8 +80,9 @@ export function useWhep(videoRef) {
       await pc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
     } catch (err) {
       setError(err.message);
+      setStatus('error');
     }
   }, [videoRef]);
 
-  return { start, stop, error };
+  return { start, stop, error, status };
 }

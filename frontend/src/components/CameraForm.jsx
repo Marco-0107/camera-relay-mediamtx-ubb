@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
+import BrandSun from './BrandSun.jsx';
 
 export default function CameraForm({ onCreated }) {
   const [name, setName] = useState('');
@@ -36,7 +37,14 @@ export default function CameraForm({ onCreated }) {
 
   return (
     <section className="panel" id="add-camera-panel">
-      <h2>Agregar cámara</h2>
+      <div className="panel__head">
+        <BrandSun className="panel__sun" />
+        <div className="panel__head-text">
+          <h2>Agregar cámara</h2>
+          <p className="panel__sub">Conecta una cámara RTSP a la retransmisión.</p>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <label>
           Nombre
@@ -58,26 +66,35 @@ export default function CameraForm({ onCreated }) {
             required
           />
         </label>
-        <div className="row">
+        <div className="field-row">
           <label>
             Usuario (opcional)
             <input type="text" value={user} onChange={(e) => setUser(e.target.value)} />
           </label>
           <label>
             Contraseña (opcional)
-            <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
+            <input
+              type="password"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+            />
           </label>
         </div>
-        <label className="checkbox">
+        <label className="checkbox-card">
           <input
             type="checkbox"
             checked={onDemand}
             onChange={(e) => setOnDemand(e.target.checked)}
           />
-          Conectar a la cámara solo cuando haya alguien viendo (ahorra carga si nadie mira)
+          <span>
+            Conectar a la cámara solo cuando haya alguien viendo (ahorra carga si
+            nadie mira).
+          </span>
         </label>
-        <button type="submit">Agregar cámara</button>
-        <p className="error">{error}</p>
+        <button type="submit" className="btn btn--primary btn--block">
+          Agregar cámara
+        </button>
+        <p className="form-error">{error}</p>
       </form>
     </section>
   );

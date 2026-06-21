@@ -43,7 +43,7 @@ export default function AreasCanvas({ videoRef, areas, onCreateArea }) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (const area of areas) {
-      drawRect(ctx, canvas, area.x, area.y, area.width, area.height, area.label, '#4f8cff');
+      drawRect(ctx, canvas, area.x, area.y, area.width, area.height, area.label, '#014898');
     }
     if (drag) {
       const { startX, startY, endX, endY } = drag;
@@ -55,7 +55,7 @@ export default function AreasCanvas({ videoRef, areas, onCreateArea }) {
         Math.abs(endX - startX),
         Math.abs(endY - startY),
         null,
-        '#ff9d4f'
+        '#f9b214'
       );
     }
   }
