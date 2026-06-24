@@ -1,9 +1,9 @@
 import { env } from '../config/env.js';
 
 export function getConfig(req, res) {
+  const origin = `${req.protocol}://${req.get('host')}`;
   res.json({
-    whepBaseUrl: env.mediamtxWebrtcPublicUrl || `http://${req.hostname}:8889`,
-    // Enlace RTSP público de la retransmisión, para abrir en VLC/ffplay/OBS.
+    hlsBaseUrl: `${origin}/hls`,
     rtspBaseUrl: env.mediamtxRtspPublicUrl || `rtsp://${req.hostname}:8554`,
   });
 }

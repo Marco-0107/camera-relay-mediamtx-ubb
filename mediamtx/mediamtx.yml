@@ -4,8 +4,6 @@
 
 logLevel: info
 
-# Control API: solo accesible dentro de la red interna de Docker (no se publica
-# fuera del compose), por eso se permite sin credenciales aquí.
 api: yes
 apiAddress: :9997
 authInternalUsers:
@@ -18,24 +16,24 @@ authInternalUsers:
       - action: read
       - action: playback
 
-# RTSP: opcional, útil para depurar con ffplay/vlc desde la red interna.
+# RTSP: para reproducir en VLC/ffplay/OBS.
 rtsp: yes
-protocols: [tcp]
+rtspTransports: [tcp]
 rtspAddress: :8554
 
-# WebRTC (WHEP): es lo que consume el frontend para la vista previa.
-webrtc: yes
-webrtcAddress: :8889
-webrtcLocalUDPAddress: :8189
-webrtcLocalTCPAddress: ""
-webrtcIPsFromInterfaces: yes
-# Se sobreescribe en runtime por la variable de entorno MTX_WEBRTCADDITIONALHOSTS
-# (definida en docker-compose.yml a partir de SERVER_HOST en el .env), para que el
-# ICE negotiation funcione cuando los clientes se conectan desde otra máquina.
-webrtcAdditionalHosts: []
+# WebRTC deshabilitado: el NAT universitario impide la negociación ICE
+# cuando los puertos externos e internos difieren. Se usa HLS en su lugar.
+webrtc: no
 
-# HLS deshabilitado: el preview usa WHEP exclusivamente.
-hls: no
+# HLS: el frontend consume los segmentos a través del proxy del backend
+# (GET /hls/*), por lo que este puerto no necesita exponerse al exterior.
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: yes
+hlsVariant: lowLatency
+hlsSegmentCount: 7
+hlsSegmentDuration: 1s
+hlsPartDuration: 200ms
 
 # Sin paths predefinidos: se agregan dinámicamente desde el backend.
 paths: {}

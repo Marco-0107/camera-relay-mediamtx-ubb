@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
-import { useWhep } from '../hooks/useWhep.js';
+import { useHls } from '../hooks/useHls.js';
 import AreasCanvas from './AreasCanvas.jsx';
 import AreasList from './AreasList.jsx';
 import BrandSun from './BrandSun.jsx';
@@ -13,9 +13,9 @@ const STATUS_LABEL = {
   error: 'Sin conexión',
 };
 
-export default function PreviewPanel({ camera, whepBaseUrl, rtspBaseUrl }) {
+export default function PreviewPanel({ camera, hlsBaseUrl, rtspBaseUrl }) {
   const videoRef = useRef(null);
-  const { start, stop, error: whepError, status } = useWhep(videoRef);
+  const { start, stop, error: whepError, status } = useHls(videoRef);
   const [areas, setAreas] = useState([]);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function PreviewPanel({ camera, whepBaseUrl, rtspBaseUrl }) {
 
     let cancelled = false;
     (async () => {
-      await start(whepBaseUrl, camera.pathName);
+      await start(hlsBaseUrl, camera.pathName);
       const cameraAreas = await api(`/api/cameras/${camera.id}/areas`);
       if (!cancelled) setAreas(cameraAreas);
     })();
@@ -50,13 +50,13 @@ export default function PreviewPanel({ camera, whepBaseUrl, rtspBaseUrl }) {
 
   function handleRetry() {
     stop();
-    start(whepBaseUrl, camera.pathName);
+    start(hlsBaseUrl, camera.pathName);
   }
 
   if (!camera) return null;
 
   const rtspUrl = rtspBaseUrl ? `${rtspBaseUrl}/${camera.pathName}` : '';
-  const browserUrl = whepBaseUrl ? `${whepBaseUrl}/${camera.pathName}` : '';
+  const browserUrl = hlsBaseUrl ? `${hlsBaseUrl}/${camera.pathName}/index.m3u8` : '';
 
   return (
     <section className="panel preview">

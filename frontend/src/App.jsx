@@ -7,7 +7,7 @@ import CameraList from './components/CameraList.jsx';
 import PreviewPanel from './components/PreviewPanel.jsx';
 
 export default function App() {
-  const [whepBaseUrl, setWhepBaseUrl] = useState('');
+  const [hlsBaseUrl, setHlsBaseUrl] = useState('');
   const [rtspBaseUrl, setRtspBaseUrl] = useState('');
   const [cameras, setCameras] = useState([]);
   const [currentCamera, setCurrentCamera] = useState(null);
@@ -21,7 +21,7 @@ export default function App() {
     (async () => {
       try {
         const config = await api('/api/config');
-        setWhepBaseUrl(config.whepBaseUrl);
+        setHlsBaseUrl(config.hlsBaseUrl || '');
         setRtspBaseUrl(config.rtspBaseUrl || '');
         await loadCameras();
       } catch (err) {
@@ -57,7 +57,7 @@ export default function App() {
           </p>
           <div className="hero__chips">
             <span className="chip">
-              <DotIcon /> RTSP → WebRTC
+              <DotIcon /> RTSP → HLS
             </span>
             <span className="chip">
               <DotIcon /> Compatible con VLC
@@ -82,7 +82,7 @@ export default function App() {
 
         <PreviewPanel
           camera={currentCamera}
-          whepBaseUrl={whepBaseUrl}
+          hlsBaseUrl={hlsBaseUrl}
           rtspBaseUrl={rtspBaseUrl}
         />
       </main>
