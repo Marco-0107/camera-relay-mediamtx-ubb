@@ -1,5 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 
+const PALETTE = [
+  '#f9b214', // gold
+  '#e74c3c', // red
+  '#2ecc71', // green
+  '#9b59b6', // purple
+  '#e67e22', // orange
+  '#1abc9c', // teal
+  '#3498db', // blue
+  '#e91e8c', // pink
+];
+
+export function areaColor(index) {
+  return PALETTE[index % PALETTE.length];
+}
+
 function drawRect(ctx, canvas, nx, ny, nw, nh, label, color) {
   const x = nx * canvas.width;
   const y = ny * canvas.height;
@@ -14,7 +29,7 @@ function drawRect(ctx, canvas, nx, ny, nw, nh, label, color) {
 
   if (label) {
     ctx.fillStyle = color;
-    ctx.font = '13px system-ui';
+    ctx.font = 'bold 13px system-ui';
     ctx.fillText(label, x + 4, y + 14);
   }
 }
@@ -31,6 +46,12 @@ export default function AreasCanvas({ videoRef, areas, onCreateArea }) {
   const canvasRef = useRef(null);
   const [drag, setDrag] = useState(null);
 
+  // Refs so event listeners always call the latest redraw without re-subscribing.
+  const areasRef = useRef(areas);
+  const dragRef = useRef(drag);
+  useEffect(() => { areasRef.current = areas; }, [areas]);
+  useEffect(() => { dragRef.current = drag; }, [drag]);
+
   function redraw() {
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -42,20 +63,19 @@ export default function AreasCanvas({ videoRef, areas, onCreateArea }) {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (const area of areas) {
-      drawRect(ctx, canvas, area.x, area.y, area.width, area.height, area.label, '#014898');
+    for (let i = 0; i < areasRef.current.length; i++) {
+      const area = areasRef.current[i];
+      drawRect(ctx, canvas, area.x, area.y, area.width, area.height, area.label, areaColor(i));
     }
-    if (drag) {
-      const { startX, startY, endX, endY } = drag;
+
+    const currentDrag = dragRef.current;
+    if (currentDrag) {
+      const { startX, startY, endX, endY } = currentDrag;
       drawRect(
-        ctx,
-        canvas,
-        Math.min(startX, endX),
-        Math.min(startY, endY),
-        Math.abs(endX - startX),
-        Math.abs(endY - startY),
-        null,
-        '#f9b214'
+        ctx, canvas,
+        Math.min(startX, endX), Math.min(startY, endY),
+        Math.abs(endX - startX), Math.abs(endY - startY),
+        null, '#ffffff'
       );
     }
   }
@@ -65,15 +85,17 @@ export default function AreasCanvas({ videoRef, areas, onCreateArea }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return undefined;
-    video.addEventListener('loadedmetadata', redraw);
-    window.addEventListener('resize', redraw);
+    const onReady = () => redraw();
+    const onResize = () => redraw();
+    // timeupdate fires once real pixel dimensions are available after HLS starts.
+    video.addEventListener('loadedmetadata', onReady);
+    video.addEventListener('timeupdate', onReady);
+    window.addEventListener('resize', onResize);
     return () => {
-      video.removeEventListener('loadedmetadata', redraw);
-      window.removeEventListener('resize', redraw);
+      video.removeEventListener('loadedmetadata', onReady);
+      video.removeEventListener('timeupdate', onReady);
+      window.removeEventListener('resize', onResize);
     };
-    // El <video> no cambia de identidad durante la vida de este componente
-    // (se monta/desmonta junto con la cámara seleccionada), por eso basta con
-    // suscribirse una sola vez al montar.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

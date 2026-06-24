@@ -994,19 +994,15 @@ input[type="password"]:focus {
   padding: 9px 13px;
   font-size: 0.9rem;
 }
-.areas-list .area-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-weight: 600;
-}
-.areas-list .area-label::before {
-  content: "";
+.areas-list .area-swatch {
   width: 11px;
   height: 11px;
   border-radius: 3px;
-  background: var(--ubb-blue);
   flex: none;
+}
+.areas-list .area-label {
+  font-weight: 600;
+  flex: 1;
 }
 .areas-empty {
   color: var(--muted);
